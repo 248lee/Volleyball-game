@@ -12,17 +12,17 @@ public class PlayerController : MonoBehaviour
     public float jumpSignalRadius = 1f;
     public LayerMask whatIsGround;
     public float doubleClickTime = .3f;
-    private bool isGrounded = false;
-    private bool isJumpSignalAvailable = false;
-    private bool jumpSignal = false;
+    private GluedBool isGrounded = new GluedBool();
+    private GluedBool isJumpSignalAvailable = new GluedBool();
+    private GluedBool jumpSignal = new GluedBool();
     private float moveInput = 0f;
-    private bool isSprinting = false;
-    private bool isSprintedBeforeJump = false;
+    private GluedBool isSprinting = new GluedBool();
+    private GluedBool isSprintedBeforeJump = new GluedBool();
     private float lastClickTime = 0f;
-    private bool isSecondJumpAvailable = false;
-    private bool secondJumpSignal = false;
+    private GluedBool isSecondJumpAvailable = new GluedBool();
+    private GluedBool secondJumpSignal = new GluedBool();
     private float speedConstant = 1f;
-    private bool isBrake = false;
+    private GluedBool isBrake = new GluedBool();
 
 
     private void TickInitial_1(ref float oneToZero)
@@ -38,6 +38,11 @@ public class PlayerController : MonoBehaviour
     {
         return (GetComponent<Rigidbody2D>().velocity.y < 0 && Physics2D.OverlapCircle(groundCheck.position, jumpSignalRadius, whatIsGround));
     }
+    private void OnEnable()
+    {
+        this.isGrounded = new GluedBool();
+        this.isJumpSignalAvailable = new GluedBool();
+    }
 
     private void Update()
     {
@@ -49,59 +54,64 @@ public class PlayerController : MonoBehaviour
             float currentTime = Time.time;
             if (currentTime - lastClickTime <= doubleClickTime)
             {
-                this.isSprinting = true;
+                this.isSprinting.ChangeValue(true);
             }
             this.lastClickTime = currentTime;
         }
         if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
         {
-            this.isSprinting = false;
+            this.isSprinting.ChangeValue(false);
         }
 
 
         // jumping function
-        if (Input.GetKey(KeyCode.Space) && isJumpSignalAvailable)
+        // 1. Holding space to brake
+        if (Input.GetKey(KeyCode.Space) && isJumpSignalAvailable.value())
         {
-            this.isBrake = true;
+            this.isBrake.ChangeValue(true) ;
             this.TickDecrease(ref speedConstant, 2f);
-            if (isSprinting)
-                this.isSprintedBeforeJump = true;
-            this.isSprinting = false;
+            if (isSprinting.value())
+                this.isSprintedBeforeJump.ChangeValue(true);
+            this.isSprinting.ChangeValue(false);
         }
-        if (Input.GetKeyUp(KeyCode.Space) && isJumpSignalAvailable)
+
+        // 2. Releasing space to jump
+        if (Input.GetKeyUp(KeyCode.Space) && isJumpSignalAvailable.value())
         {
-            this.jumpSignal = true;
-            this.isBrake = false;
+            this.jumpSignal.ChangeValue(true);
+            this.isBrake.ChangeValue(false);
             this.TickInitial_1(ref speedConstant);
         }
-        if (Input.GetKeyDown(KeyCode.Space) && isSecondJumpAvailable)
+
+        // 3. Press space to second jump.
+        if (Input.GetKeyDown(KeyCode.Space) && isSecondJumpAvailable.value())
         {
-            this.secondJumpSignal = true;
+            this.secondJumpSignal.ChangeValue(true);
         }
-        if (jumpSignal && isGrounded) // ordinary jump
+
+        // Perform jumping
+        if (jumpSignal.value() && isGrounded.value()) // ordinary jump
         {
             // start performing jumping
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 direction = (mousePos - (Vector2)transform.position).normalized;
-            float actualJumpForce = isSprintedBeforeJump ? sprintJumpForce : jumpForce;
+            float actualJumpForce = isSprintedBeforeJump.value() ? sprintJumpForce : jumpForce;
             GetComponent<Rigidbody2D>().velocity = direction * actualJumpForce;
-            this.isGrounded = false;
-            this.jumpSignal = false;
-            this.isJumpSignalAvailable = false;
-            if (isSprintedBeforeJump)
+            this.jumpSignal.ChangeValue(false);
+            _ = isJumpSignalAvailable.GluedChangeValue(false, 0.5f);
+            if (isSprintedBeforeJump.value())
             {
-                this.isSecondJumpAvailable = true;
+                this.isSecondJumpAvailable.ChangeValue(true);
             }
-            this.isSprintedBeforeJump = false;
+            this.isSprintedBeforeJump.ChangeValue(false);
         }
-        else if (secondJumpSignal)
+        else if (secondJumpSignal.value()) // second jump
         {
-            // start performing second jumping
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 direction = (mousePos - (Vector2)transform.position).normalized;
             GetComponent<Rigidbody2D>().velocity = direction * secondJumpForce;
-            this.isSecondJumpAvailable = false;
-            this.secondJumpSignal = false;
+            _ = isSecondJumpAvailable.GluedChangeValue(false, 0.5f);
+            this.secondJumpSignal.ChangeValue(false);
         }
 
     }
@@ -110,14 +120,14 @@ public class PlayerController : MonoBehaviour
     {
         if (this.IsAlmostFallOnGround())
         {
-            this.isSecondJumpAvailable = false;
+            this.isSecondJumpAvailable.ChangeValue(false);
         }
-        this.isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
-        this.isJumpSignalAvailable = IsAlmostFallOnGround() || isGrounded;
+        this.isGrounded.ChangeValue(Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround));
+        this.isJumpSignalAvailable.ChangeValue(IsAlmostFallOnGround() || isGrounded.value());
 
-        if (isGrounded) // horizontal input only available on the ground.
+        if (isGrounded.value()) // horizontal input only available on the ground.
         {
-            float currentSpeed = isSprinting ? moveSpeed_sprint : moveSpeed;
+            float currentSpeed = isSprinting.value() ? moveSpeed_sprint : moveSpeed;
             currentSpeed *= this.speedConstant;
             this.transform.position += new Vector3(moveInput * currentSpeed * speedConstant * Time.deltaTime, 0, 0);
         }

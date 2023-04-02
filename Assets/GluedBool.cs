@@ -1,8 +1,8 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
 
-public class GluedBool : MonoBehaviour
+public class GluedBool
 {
     private bool v;
     private bool isGlued = false;
@@ -12,28 +12,23 @@ public class GluedBool : MonoBehaviour
     }
     public void ChangeValue(bool value)
     {
-        if (!this.isGlued)
+        if (!isGlued)
         {
             this.v = value;
         }
         else
             Debug.Log("This variable is glued now! Please double click this message and check why you attempt to change the glued bool!");
     }
-    public void GluedChangeValue(bool value, float gluedTime)
+    public async Task GluedChangeValue(bool value, float time)
     {
-        if (!this.isGlued)
+        if (!isGlued)
         {
+            isGlued = true;
             this.v = value;
-            StartCoroutine(Glue(gluedTime));
+            await Task.Delay((int)(time * 1000));
+            isGlued = false;
         }
         else
             Debug.Log("This variable is glued now! Please double click this message and check why you attempt to change the glued bool!");
-
-    }
-    IEnumerator Glue(float gluedTime)
-    {
-        this.isGlued = true;
-        yield return new WaitForSeconds(gluedTime);
-        this.isGlued = false;
     }
 }
