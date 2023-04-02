@@ -2,31 +2,27 @@ using UnityEngine;
 
 public class BallController : MonoBehaviour
 {
-    public GameObject ballObject;
-    public float ballSpeed = 10f;
-    private GameObject currentBall;
-    private bool isAttached = true;
+    public float jumpForce = 10f;
+    public float closeDistance = 2f;
+    public Rigidbody2D ballRigidbody;
+    private bool canJump = false;
 
-    private void Start()
-    {
-        this.currentBall = ballObject;
-        this.currentBall.GetComponent<Rigidbody2D>().isKinematic = true;
-    }
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canJump)
         {
-            if (isAttached)
-            {
-                this.currentBall.transform.parent = null;
-                this.isAttached = false;
-            }
-            else
-            {
-                this.currentBall.GetComponent<Rigidbody2D>().isKinematic = false;
-                Vector2 direction = new Vector2(1, -1).normalized;
-                this.currentBall.GetComponent<Rigidbody2D>().AddForce(direction * ballSpeed);
-            }
+            ballRigidbody.velocity = new Vector2(0f, 0f);
+            ballRigidbody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            canJump = false;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        float distance = Vector2.Distance(transform.position, ballRigidbody.transform.position);
+        if (distance <= closeDistance)
+        {
+            canJump = true;
         }
     }
 }
