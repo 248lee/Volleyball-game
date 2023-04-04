@@ -350,12 +350,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 446226770}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.82, y: -0.59999996, z: 0}
-  m_LocalScale: {x: 0.46360043, y: 0.46360043, z: 0.46360043}
+  m_LocalPosition: {x: 1.0007432, y: 1.070331, z: 0}
+  m_LocalScale: {x: 0.6627787, y: 0.6627787, z: 0.6627787}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_Father: {fileID: 864392207}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &512859873
 GameObject:
@@ -808,7 +808,8 @@ Transform:
   m_LocalPosition: {x: -5.52, y: -1.348675, z: 0}
   m_LocalScale: {x: 0.69948, y: 0.69948, z: 0.69948}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 446226774}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -861,7 +862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f2ff3712e0da254eaf18854f522a9cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballObject: {fileID: 0}
+  ballObject: {fileID: 446226770}
   ballSpeed: 10
 --- !u!1 &1319854116
 GameObject:

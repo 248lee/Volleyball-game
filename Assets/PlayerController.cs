@@ -125,6 +125,7 @@ public class PlayerController : MonoBehaviour
         this.isGrounded.ChangeValue(Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround));
         this.isJumpSignalAvailable.ChangeValue(IsAlmostFallOnGround() || isGrounded.value());
 
+        // perform horizontal moving
         if (isGrounded.value()) // horizontal input only available on the ground.
         {
             float currentSpeed = isSprinting.value() ? moveSpeed_sprint : moveSpeed;
