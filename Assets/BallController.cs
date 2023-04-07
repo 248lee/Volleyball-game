@@ -8,7 +8,7 @@ public class BallController : MonoBehaviour
     public float shiftReceiveForce = 10f;
     public float shiftReceiveRadius = 2f;
     public Rigidbody2D ballRigidbody;
-    private bool canShiftReceive = false;
+    private GluedBool canShiftReceive = new GluedBool();
     public float shiftReceiveFromAngle = -45f;
     public float shiftRangeAngle = 90f;
     public Vector3 shiftReceiveFromVector;
@@ -20,11 +20,11 @@ public class BallController : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift) && canShiftReceive)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canShiftReceive.value())
         {
             ballRigidbody.velocity = new Vector2(0f, 0f);
             ballRigidbody.AddForce(Vector2.up * shiftReceiveForce, ForceMode2D.Impulse);
-            canShiftReceive = false;
+            _ = canShiftReceive.GluedChangeValue(false, 0.2f);
         }
     }
 
@@ -32,7 +32,7 @@ public class BallController : MonoBehaviour
     {
         float distance = Vector2.Distance(transform.position, ballRigidbody.transform.position);
         Vector3 ballDir = ballRigidbody.transform.position - transform.position;
-        canShiftReceive = (distance <= shiftReceiveRadius && MathV.isVectorBetween(shiftReceiveFromVector, shiftReceiveToVector, ballDir));
+        this.canShiftReceive.ChangeValue(distance <= shiftReceiveRadius && MathV.isVectorBetween(shiftReceiveFromVector, shiftReceiveToVector, ballDir));
     }
 }
 
