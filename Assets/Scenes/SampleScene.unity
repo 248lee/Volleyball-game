@@ -246,6 +246,7 @@ GameObject:
   - component: {fileID: 446226773}
   - component: {fileID: 446226772}
   - component: {fileID: 446226771}
+  - component: {fileID: 446226775}
   m_Layer: 7
   m_Name: Ball
   m_TagString: Untagged
@@ -350,13 +351,26 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 446226770}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.82, y: -0.5999999, z: 0}
+  m_LocalPosition: {x: 7.81, y: 2.91, z: 0}
   m_LocalScale: {x: 0.46360043, y: 0.46360043, z: 0.46360043}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &446226775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446226770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5194adbd2f3fed64292b4d2f87866289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serveForce: 700
 --- !u!1 &512859873
 GameObject:
   m_ObjectHideFlags: 0
@@ -844,7 +858,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1.99
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 3590218ffeb335f4ea2959e953ab0307, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -861,13 +875,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f2ff3712e0da254eaf18854f522a9cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shiftReceiveForce: 10
-  shiftReceiveRadius: 2
   ballRigidbody: {fileID: 446226772}
-  shiftReceiveFromAngle: -47.5
-  shiftRangeAngle: 99.1
-  shiftReceiveFromVector: {x: 0.67559016, y: -0.7372774, z: 0}
-  shiftReceiveToVector: {x: 0.6211479, y: 0.78369343, z: 0}
+  shiftReceiveFromAngle: -48.6
+  shiftRangeAngle: 115
+  shiftReceiveForce: 10
+  shiftReceiveRadius: 1.5
+  shiftReceiveFromVector: {x: 0.66131186, y: -0.75011104, z: 0}
+  shiftReceiveToVector: {x: 0.4003489, y: 0.9163628, z: 0}
+  upReceiveFromAngle: 57.1
+  upRangeAngle: 48
+  upReceiveForce: 12.9
+  upReceiveRadius: 2
+  upReceiveFromVector: {x: 0.5431745, y: 0.8396199, z: 0}
+  upReceiveToVector: {x: -0.26050454, y: 0.96547264, z: 0}
 --- !u!1 &1319854116
 GameObject:
   m_ObjectHideFlags: 0
