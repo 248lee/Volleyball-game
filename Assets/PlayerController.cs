@@ -5,8 +5,9 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 5f;
     public float moveSpeed_sprint = 10f;
     public float jumpForce = 10f;
-    public float secondJumpForce = 10f;
+    public float secondJumpSpeed = .5f;
     public float sprintJumpForce = 20f;
+    public float stuckDuration = .2f;
     public Transform groundCheck;
     public float groundRadius = 0.1f;
     public float jumpSignalRadius = 1f;
@@ -23,6 +24,9 @@ public class PlayerController : MonoBehaviour
     private GluedBool secondJumpSignal = new GluedBool();
     private float speedConstant = 1f;
     private GluedBool isBrake = new GluedBool();
+    private Vector2 secondJumpVelocity;
+    private GluedBool isPerformingSecondJump = new GluedBool();
+    private GluedBool isStucking = new GluedBool();
 
 
     private void TickInitial_1(ref float oneToZero)
@@ -105,14 +109,43 @@ public class PlayerController : MonoBehaviour
             }
             this.isSprintedBeforeJump.ChangeValue(false);
         }
-        else if (secondJumpSignal.value()) // second jump
+        else if (secondJumpSignal.value() || isPerformingSecondJump.value() || isStucking.value()) // second jump
         {
-            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 direction = (mousePos - (Vector2)transform.position).normalized;
-            GetComponent<Rigidbody2D>().velocity = direction * secondJumpForce;
-            _ = isSecondJumpAvailable.GluedChangeValue(false, 0.5f);
-            this.secondJumpSignal.ChangeValue(false);
+            if (secondJumpSignal.value()) // second jump initialize
+            {
+                Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                float secondJumpDuration = Vector2.SqrMagnitude((mousePos - (Vector2)transform.position)) * this.secondJumpSpeed / 30f;
+                this.secondJumpVelocity = (mousePos - (Vector2)transform.position) / secondJumpDuration;
+                // Start timer
+                Timers.SetTimer("secondJumpTiktok", secondJumpDuration);
+                this.secondJumpSignal.ChangeValue(false);
+                this.isPerformingSecondJump.ChangeValue(true);
+                _ = isSecondJumpAvailable.GluedChangeValue(false, 0.5f);
+            }
+            if (isPerformingSecondJump.value()) // second jumping
+            {
+                GetComponent<Rigidbody2D>().velocity = this.secondJumpVelocity;
+                CameraController.SetFollowingPlayer(false);
+
+                if (Timers.isTimerFinished("secondJumpTiktok"))
+                {
+                    this.isStucking.ChangeValue(true);
+                    Timers.SetTimer("StuckTiktok", stuckDuration);
+                    this.isPerformingSecondJump.ChangeValue(false);
+                }
+            }
+            if (isStucking.value()) // stucking
+            {
+                GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+                if (Timers.isTimerFinished("StuckTiktok"))
+                {
+                    this.isStucking.ChangeValue(false);
+                    CameraController.SetFollowingPlayer(true);
+                }
+
+            }
         }
+
 
     }
 

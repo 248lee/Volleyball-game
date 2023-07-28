@@ -707,8 +707,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 557966333}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.92, y: 0.9123, z: 0}
-  m_LocalScale: {x: 0.6, y: 6.54108, z: 1}
+  m_LocalPosition: {x: -8.92, y: 4.1028, z: 0}
+  m_LocalScale: {x: 0.6, y: 12.921904, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -750,10 +750,11 @@ MonoBehaviour:
   moveSpeed: 4
   moveSpeed_sprint: 7
   jumpForce: 12.41
-  secondJumpForce: 10
+  secondJumpSpeed: 0.21
   sprintJumpForce: 17
+  stuckDuration: 0.2
   groundCheck: {fileID: 864392207}
-  groundRadius: 1.02
+  groundRadius: 1.23
   jumpSignalRadius: 1.74
   whatIsGround:
     serializedVersion: 2
@@ -800,9 +801,9 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
-  m_FlipX: 0
+  m_Sprite: {fileID: -1633115145, guid: 5b13568ef89aeb149a2bd059986ad52d, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 2}
@@ -819,8 +820,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 864392204}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.52, y: -1.348675, z: 0}
-  m_LocalScale: {x: 0.69948, y: 0.69948, z: 0.69948}
+  m_LocalPosition: {x: -4.4842, y: -1.24, z: 0}
+  m_LocalScale: {x: 1.7563621, y: 1.7563621, z: 1.7563621}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -839,7 +840,7 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.33}
   m_Size: {x: 1, y: 2}
   m_Direction: 0
 --- !u!50 &864392209
@@ -882,12 +883,12 @@ MonoBehaviour:
   shiftReceiveRadius: 1.5
   shiftReceiveFromVector: {x: 0.66131186, y: -0.75011104, z: 0}
   shiftReceiveToVector: {x: 0.4003489, y: 0.9163628, z: 0}
-  upReceiveFromAngle: 57.1
-  upRangeAngle: 48
+  upReceiveFromAngle: 46.06
+  upRangeAngle: 81
   upReceiveForce: 12.9
-  upReceiveRadius: 2
-  upReceiveFromVector: {x: 0.5431745, y: 0.8396199, z: 0}
-  upReceiveToVector: {x: -0.26050454, y: 0.96547264, z: 0}
+  upReceiveRadius: 2.33
+  upReceiveFromVector: {x: 0.69390464, y: 0.7200669, z: 0}
+  upReceiveToVector: {x: -0.60265106, y: 0.7980048, z: 0}
 --- !u!1 &1319854116
 GameObject:
   m_ObjectHideFlags: 0
