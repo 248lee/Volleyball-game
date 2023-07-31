@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public float secondJumpSpeed = .5f;
     public float sprintJumpForce = 20f;
     public float stuckDuration = .2f;
+    public float stuckY_limit = 0f;
     public Transform groundCheck;
     public float groundRadius = 0.1f;
     public float jumpSignalRadius = 1f;
@@ -129,8 +130,11 @@ public class PlayerController : MonoBehaviour
 
                 if (Timers.isTimerFinished("secondJumpTiktok"))
                 {
-                    this.isStucking.ChangeValue(true);
-                    Timers.SetTimer("StuckTiktok", stuckDuration);
+                    if (transform.position.y > stuckY_limit)
+                    {
+                        this.isStucking.ChangeValue(true);
+                        Timers.SetTimer("StuckTiktok", stuckDuration);
+                    }
                     this.isPerformingSecondJump.ChangeValue(false);
                 }
             }

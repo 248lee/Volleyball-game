@@ -6,7 +6,6 @@ public class CameraController : MonoBehaviour
 {
     public GameObject followingPlayer;
     public float horizontalOffset = 10f;
-    private static bool isBackSliping = false;
     private static bool isFollowingPlayer = true;
     // Start is called before the first frame update
     void Start()
