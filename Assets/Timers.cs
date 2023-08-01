@@ -34,7 +34,7 @@ public class Timers : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("There's an existing already!");
+                    Debug.Log("There's an existing {" + name + "} already!");
                     return;
                 }
             }
@@ -64,16 +64,23 @@ public class Timers : MonoBehaviour
         }
         return true; // No such timer found, it may be cleaned, so it is finished.
     }
-    public static float getTimerStart(string name)
+    public static float GetTimerPrgress(string name)
     {
         for (int i = 0; i < timers.Count; i++)
         {
             if (name == timers[i].name)
             {
-                return timers[i].startTime;
+                float timePassed = Time.time - timers[i].startTime;
+                if (timePassed < timers[i].duration)
+                    return timePassed / timers[i].duration;
+                else
+                {
+                    timers.RemoveAt(i);
+                    return 1f;
+                }
             }
         }
-        return 0;
+        return 1f; // No such timer found, it may be cleaned, so it is hundred percent progressed.
     }
     public static void CleanGarbageTimer()
     {

@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour
     public float sprintJumpForce = 20f;
     public float stuckDuration = .2f;
     public float stuckY_limit = 0f;
+    public float saveReceiveDuration = .4f;
+    public float saveReceiveSpeed = 40f;
     public Transform groundCheck;
     public float groundRadius = 0.1f;
     public float jumpSignalRadius = 1f;
@@ -28,6 +30,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 secondJumpVelocity;
     private GluedBool isPerformingSecondJump = new GluedBool();
     private GluedBool isStucking = new GluedBool();
+    private GluedBool isSaveReceiving = new GluedBool();
+    private GluedBool saveReceiveSignal = new GluedBool();
 
 
     private void TickInitial_1(ref float oneToZero)
@@ -41,7 +45,7 @@ public class PlayerController : MonoBehaviour
     }
     private bool IsAlmostFallOnGround()
     {
-        return (GetComponent<Rigidbody2D>().velocity.y < 0 && Physics2D.OverlapCircle(groundCheck.position, jumpSignalRadius, whatIsGround));
+        return (GetComponent<Rigidbody2D>().velocity.y <= 0.05f && Physics2D.OverlapCircle(groundCheck.position, jumpSignalRadius, whatIsGround));
     }
     private void OnEnable()
     {
@@ -83,9 +87,14 @@ public class PlayerController : MonoBehaviour
         // 2. Releasing space to jump
         if (Input.GetKeyUp(KeyCode.Space) && isJumpSignalAvailable.value())
         {
-            this.jumpSignal.ChangeValue(true);
             this.isBrake.ChangeValue(false);
             this.TickInitial_1(ref speedConstant);
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 direction = (mousePos - (Vector2)transform.position).normalized;
+            if (direction.y / Mathf.Abs(direction.x) > 1f)
+                this.jumpSignal.ChangeValue(true);
+            else
+                this.saveReceiveSignal.ChangeValue(true);
         }
 
         // 3. Press space to second jump.
@@ -94,21 +103,23 @@ public class PlayerController : MonoBehaviour
             this.secondJumpSignal.ChangeValue(true);
         }
 
-        // Perform jumping
+        // Perform jumping (dealing with signals)
         if (jumpSignal.value() && isGrounded.value()) // ordinary jump
         {
-            // start performing jumping
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 direction = (mousePos - (Vector2)transform.position).normalized;
+            
+            // start performing jumping
             float actualJumpForce = isSprintedBeforeJump.value() ? sprintJumpForce : jumpForce;
             GetComponent<Rigidbody2D>().velocity = direction * actualJumpForce;
-            this.jumpSignal.ChangeValue(false);
-            _ = isJumpSignalAvailable.GluedChangeValue(false, 0.5f);
+
             if (isSprintedBeforeJump.value())
             {
                 this.isSecondJumpAvailable.ChangeValue(true);
             }
             this.isSprintedBeforeJump.ChangeValue(false);
+            this.jumpSignal.ChangeValue(false);
+            _ = isJumpSignalAvailable.GluedChangeValue(false, 0.5f);
         }
         else if (secondJumpSignal.value() || isPerformingSecondJump.value() || isStucking.value()) // second jump
         {
@@ -149,7 +160,24 @@ public class PlayerController : MonoBehaviour
 
             }
         }
-
+        else if (this.saveReceiveSignal.value() || this.isSaveReceiving.value())
+        {
+            if (this.saveReceiveSignal.value())
+            {
+                Timers.SetTimer("SaveReceiving", saveReceiveDuration);
+                this.isSaveReceiving.ChangeValue(true);
+                this.saveReceiveSignal.ChangeValue(false);
+            }
+            if (this.isSaveReceiving.value())
+            {
+                float actualSaveSpeed = saveReceiveSpeed * (1f - Timers.GetTimerPrgress("SaveReceiving"));
+                GetComponent<Rigidbody2D>().velocity = actualSaveSpeed * transform.right;
+                if (Timers.isTimerFinished("SaveReceiving"))
+                {
+                    this.isSaveReceiving.ChangeValue(false);
+                }
+            }
+        }
 
     }
 
@@ -163,7 +191,7 @@ public class PlayerController : MonoBehaviour
         this.isJumpSignalAvailable.ChangeValue(IsAlmostFallOnGround() || isGrounded.value());
 
         // perform horizontal moving
-        if (isGrounded.value()) // horizontal input only available on the ground.
+        if (isGrounded.value() && !isSaveReceiving.value()) // horizontal input only available on the ground.
         {
             float currentSpeed = isSprinting.value() ? moveSpeed_sprint : moveSpeed;
             currentSpeed *= this.speedConstant;

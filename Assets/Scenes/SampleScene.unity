@@ -874,7 +874,7 @@ GameObject:
   - component: {fileID: 864392209}
   - component: {fileID: 864392208}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -898,6 +898,9 @@ MonoBehaviour:
   secondJumpSpeed: 0.21
   sprintJumpForce: 17
   stuckDuration: 0.2
+  stuckY_limit: 0.57
+  saveReceiveDuration: 0.6
+  saveReceiveSpeed: 17
   groundCheck: {fileID: 864392207}
   groundRadius: 1.23
   jumpSignalRadius: 1.74

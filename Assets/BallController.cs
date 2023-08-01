@@ -9,6 +9,7 @@ public class BallController : MonoBehaviour
     public Rigidbody2D ballRigidbody;
     private GluedBool canShiftReceive = new GluedBool();
     private GluedBool canUpReceive = new GluedBool();
+    private GluedBool canSaveReceive = new GluedBool();
     // Inspector values of ShiftReceive
     [HideInInspector] public float shiftReceiveFromAngle = -45f;
     [HideInInspector, Range(0f, 359f)] public float shiftRangeAngle = 90f;
@@ -60,6 +61,10 @@ public class BallController : MonoBehaviour
         this.canShiftReceive.ChangeValue(distancePlayer_Ball <= shiftReceiveRadius && MathV.isVectorBetween(shiftReceiveFromVector, shiftReceiveToVector, directionPlayer_Ball));
         // Change the value: canUpReceive
         this.canUpReceive.ChangeValue(distancePlayer_Ball <= upReceiveRadius && MathV.isVectorBetween(upReceiveFromVector, upReceiveToVector, directionPlayer_Ball));
+    }
+    public void SetCanSaveReceive(bool set)
+    {
+        this.canSaveReceive.ChangeValue(set);
     }
 }
 
