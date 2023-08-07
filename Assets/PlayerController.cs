@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask whatIsGround;
     public float doubleClickTime = .3f;
     private GluedBool isGrounded = new GluedBool();
-    private GluedBool isJumpSignalAvailable = new GluedBool();
+    private GluedBool isJumpAndSaveSignalAvailable = new GluedBool();
     private GluedBool jumpSignal = new GluedBool();
     private float moveInput = 0f;
     private GluedBool isSprinting = new GluedBool();
@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         this.isGrounded = new GluedBool();
-        this.isJumpSignalAvailable = new GluedBool();
+        this.isJumpAndSaveSignalAvailable = new GluedBool();
     }
 
     private void Update()
@@ -75,7 +75,7 @@ public class PlayerController : MonoBehaviour
 
         // jumping function
         // 1. Holding space to brake
-        if (Input.GetKey(KeyCode.Space) && isJumpSignalAvailable.value())
+        if (Input.GetKey(KeyCode.Space) && isJumpAndSaveSignalAvailable.value())
         {
             this.isBrake.ChangeValue(true) ;
             this.TickDecrease(ref speedConstant, 2f);
@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // 2. Releasing space to jump
-        if (Input.GetKeyUp(KeyCode.Space) && isJumpSignalAvailable.value())
+        if (Input.GetKeyUp(KeyCode.Space) && isJumpAndSaveSignalAvailable.value())
         {
             this.isBrake.ChangeValue(false);
             this.TickInitial_1(ref speedConstant);
@@ -103,12 +103,17 @@ public class PlayerController : MonoBehaviour
             this.secondJumpSignal.ChangeValue(true);
         }
 
-        // Perform jumping (dealing with signals)
+        // Perform jumping and saving (dealing with signals)
         if (jumpSignal.value() && isGrounded.value()) // ordinary jump
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 direction = (mousePos - (Vector2)transform.position).normalized;
-            
+
+            // saving interuption
+            this.isSaveReceiving.ChangeValue(false);
+            GetComponent<Animator>().SetBool("anisave", false);
+            this.SetColliderStandup();
+
             // start performing jumping
             float actualJumpForce = isSprintedBeforeJump.value() ? sprintJumpForce : jumpForce;
             GetComponent<Rigidbody2D>().velocity = direction * actualJumpForce;
@@ -119,7 +124,40 @@ public class PlayerController : MonoBehaviour
             }
             this.isSprintedBeforeJump.ChangeValue(false);
             this.jumpSignal.ChangeValue(false);
-            _ = isJumpSignalAvailable.GluedChangeValue(false, 0.5f);
+            _ = isJumpAndSaveSignalAvailable.GluedChangeValue(false, 0.5f);
+        }
+        else if (this.saveReceiveSignal.value() || this.isSaveReceiving.value()) /*jumping interupts saving*/
+        {
+            if (this.saveReceiveSignal.value()) // saveReceive initializing
+            {
+                // let player lie down
+                GetComponent<Animator>().SetBool("anisave", true);
+                this.SetColliderLiedown();
+
+                Timers.SetTimer("SaveReceiving", saveReceiveDuration);
+                this.isSaveReceiving.ChangeValue(true);
+                this.saveReceiveSignal.ChangeValue(false);
+                this.isSprintedBeforeJump.ChangeValue(false);
+
+                // second jumping interuption
+                this.isSecondJumpAvailable.ChangeValue(false);
+                this.secondJumpSignal.ChangeValue(false);
+                this.isPerformingSecondJump.ChangeValue(false);
+                this.isStucking.ChangeValue(false);
+                CameraController.SetFollowingPlayer(true);
+            }
+            if (this.isSaveReceiving.value())
+            {
+                // start performing saving
+                float actualSaveSpeed = saveReceiveSpeed * (1f - Timers.GetTimerPrgress("SaveReceiving"));
+                GetComponent<Rigidbody2D>().velocity = actualSaveSpeed * transform.right;
+                if (Timers.isTimerFinished("SaveReceiving"))
+                {
+                    this.isSaveReceiving.ChangeValue(false);
+                    GetComponent<Animator>().SetBool("anisave", false);
+                    this.SetColliderStandup();
+                }
+            }
         }
         else if (secondJumpSignal.value() || isPerformingSecondJump.value() || isStucking.value()) // second jump
         {
@@ -160,25 +198,6 @@ public class PlayerController : MonoBehaviour
 
             }
         }
-        else if (this.saveReceiveSignal.value() || this.isSaveReceiving.value())
-        {
-            if (this.saveReceiveSignal.value())
-            {
-                Timers.SetTimer("SaveReceiving", saveReceiveDuration);
-                this.isSaveReceiving.ChangeValue(true);
-                this.saveReceiveSignal.ChangeValue(false);
-            }
-            if (this.isSaveReceiving.value())
-            {
-                float actualSaveSpeed = saveReceiveSpeed * (1f - Timers.GetTimerPrgress("SaveReceiving"));
-                GetComponent<Rigidbody2D>().velocity = actualSaveSpeed * transform.right;
-                if (Timers.isTimerFinished("SaveReceiving"))
-                {
-                    this.isSaveReceiving.ChangeValue(false);
-                }
-            }
-        }
-
     }
 
     private void FixedUpdate()
@@ -188,7 +207,7 @@ public class PlayerController : MonoBehaviour
             this.isSecondJumpAvailable.ChangeValue(false);
         }
         this.isGrounded.ChangeValue(Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround));
-        this.isJumpSignalAvailable.ChangeValue(IsAlmostFallOnGround() || isGrounded.value());
+        this.isJumpAndSaveSignalAvailable.ChangeValue(IsAlmostFallOnGround() || isGrounded.value());
 
         // perform horizontal moving
         if (isGrounded.value() && !isSaveReceiving.value()) // horizontal input only available on the ground.
@@ -205,5 +224,19 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawWireSphere(groundCheck.position, groundRadius);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, jumpSignalRadius);
+    }
+
+    private void SetColliderStandup()
+    {
+        GetComponent<CapsuleCollider2D>().direction = CapsuleDirection2D.Vertical;
+        GetComponent<CapsuleCollider2D>().offset = new Vector2(0, -0.31f);
+        GetComponent<CapsuleCollider2D>().size = new Vector2(.55f, 1.52f);
+    }
+
+    private void SetColliderLiedown()
+    {
+        GetComponent<CapsuleCollider2D>().direction = CapsuleDirection2D.Horizontal;
+        GetComponent<CapsuleCollider2D>().offset = new Vector2(0, -0.77f);
+        GetComponent<CapsuleCollider2D>().size = new Vector2(1.52f, .55f);
     }
 }

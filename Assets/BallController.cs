@@ -29,7 +29,7 @@ public class BallController : MonoBehaviour
 
     private void Start()
     {
-        this.shiftReceiveFromVector = Quaternion.AngleAxis(shiftReceiveFromAngle, Vector3.forward) * transform.right; // 注意這裡只用了右邊，而不是玩家面向的方向。之後要改
+        this.shiftReceiveFromVector = Quaternion.AngleAxis(shiftReceiveFromAngle, Vector3.forward) * transform.right;
         this.shiftReceiveToVector = Quaternion.AngleAxis(shiftRangeAngle, Vector3.forward) * shiftReceiveFromVector;
     }
 
