@@ -15,8 +15,8 @@ public class GluedBool
         {
             this.v = value;
         }
-        else
-            Debug.Log("This variable is glued now! Please double click this message and check why you attempt to change the glued bool!");
+        //else
+        //    Debug.Log("This variable is glued now! Please double click this message and check why you attempt to change the glued bool!");
     }
     public async Task GluedChangeValue(bool value, float time)
     {
@@ -27,7 +27,7 @@ public class GluedBool
             await Task.Delay((int)(time * 1000));
             isGlued = false;
         }
-        else
-            Debug.Log("This variable is glued now! Please double click this message and check why you attempt to change the glued bool!");
+        //else
+        //    Debug.Log("This variable is glued now! Please double click this message and check why you attempt to change the glued bool!");
     }
 }

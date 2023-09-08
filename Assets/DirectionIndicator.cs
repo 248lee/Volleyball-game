@@ -2,20 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DirectionIndicator : MonoBehaviour
+public class DirectionIndicator : SegmentController
 {
-    public Transform player;
-    private LineRenderer lr;
+    public Transform from;
+    public Vector2 fromOffset = Vector2.zero;
+    public Transform pointTo;
+    public float length;
     // Start is called before the first frame update
     void Start()
     {
-        this.lr = GetComponent<LineRenderer>();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3[] vertices = { player.position, (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) };
-        lr.SetPositions(vertices);
+        Vector3 fromPos = this.from.position + (Vector3)(this.fromOffset);
+        Vector3 pointToPos = this.pointTo.position;
+        Vector3 direction = pointToPos - fromPos;
+        Vector3 endPoint = fromPos + (direction.normalized * length);
+        DrawLine(fromPos, endPoint);
+    }
+    public void SetFromOffset(Vector2 set)
+    {
+        this.fromOffset = set;
     }
 }

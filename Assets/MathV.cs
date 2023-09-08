@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class MathV : MonoBehaviour
 {
+    /// <summary>
+    /// Cross operatioin of R^2 vectors.
+    /// </summary>
+    /// <param name="from">The first vector.</param>
+    /// <param name="to">The second vector</param>
+    /// <returns>A float as a result of crossing. Also known as determinants.</returns>
     public static float cross(Vector2 from, Vector2 to)
     {
         return from.x * to.y - from.y * to.x;
@@ -25,7 +31,18 @@ public class MathV : MonoBehaviour
         }
         else
         {
-            return !(cross(from, target) <= 0f && cross(to, target) >= 0f);
+            return (cross(from, target) <= 0f && cross(to, target) >= 0f);
         }
+    }
+
+    /// <summary>
+    /// Cosine value of 2 vectors. Notice that the order of the parameters don't mind.
+    /// </summary>
+    /// <param name="aVector"></param>
+    /// <param name="anotherVector"></param>
+    /// <returns></returns>
+    public static float cos(Vector2 aVector, Vector2 anotherVector)
+    {
+        return Vector2.Dot(aVector, anotherVector) / (aVector.magnitude * anotherVector.magnitude);
     }
 }

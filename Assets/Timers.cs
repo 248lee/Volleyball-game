@@ -18,7 +18,7 @@ public class Timers : MonoBehaviour
         }
     }
     public static List<Timer> timers = new List<Timer>();
-    
+
     public static void SetTimer(string name, float duration)
     {
         bool isGarbageTimerExists = false;
@@ -26,7 +26,7 @@ public class Timers : MonoBehaviour
         {
             if (name == timers[i].name)
             {
-                if (Time.time - timers[i].startTime >=  timers[i].duration)
+                if (Time.time - timers[i].startTime >= timers[i].duration)
                 {
                     isGarbageTimerExists = true;
                     timers[i].startTime = Time.time;
@@ -42,6 +42,47 @@ public class Timers : MonoBehaviour
         if (!isGarbageTimerExists)
             timers.Add(new Timer(name, Time.time, duration));
 
+        CleanGarbageTimer();
+    }
+
+    public static void SetTimer(string name, float duration, bool canOverride)
+    {
+        bool isGarbageTimerExists = false;
+        if (!canOverride)
+        {
+            for (int i = 0; i < timers.Count; i++)
+            {
+                if (name == timers[i].name)
+                {
+                    if (Time.time - timers[i].startTime >= timers[i].duration)
+                    {
+                        isGarbageTimerExists = true;
+                        timers[i].startTime = Time.time;
+                        break;
+                    }
+                    else
+                    {
+                        Debug.Log("There's an existing {" + name + "} already!");
+                        return;
+                    }
+                }
+            }
+
+        }
+        else
+        {
+            for (int i = 0; i < timers.Count; i++)
+            {
+                if (name == timers[i].name)
+                {
+                    isGarbageTimerExists = true;
+                    timers[i].startTime = Time.time;
+                    break;
+                }
+            }
+        }
+        if (!isGarbageTimerExists)
+            timers.Add(new Timer(name, Time.time, duration));
         CleanGarbageTimer();
     }
 
