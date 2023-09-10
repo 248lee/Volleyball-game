@@ -875,7 +875,7 @@ GameObject:
   - component: {fileID: 831615017}
   m_Layer: 0
   m_Name: SegmentPlayer_Mouse
-  m_TagString: Untagged
+  m_TagString: Indicator_Mouse
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

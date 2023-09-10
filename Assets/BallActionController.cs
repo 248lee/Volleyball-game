@@ -109,7 +109,9 @@ public class BallActionController : MonoBehaviour
             // Draw the kill direction indicator
             this.killDirectionIndicator.SetFromOffset(killCenterOffset);
             this.killDirectionIndicator.gameObject.SetActive(true);
-            if (this.killSignal.value())
+            // Modify the from point of the mouse-direction indicator to match the kill direction indicator.
+            GameObject.FindGameObjectWithTag("Indicator_Mouse").GetComponent<SegmentIndicatorMouse>().SetFromOffset(killCenterOffset);
+            if (this.killSignal.value()) // if the kill signal comes
             {
                 _ = this.killSignal.GluedChangeValue(false, .3f);
                 // start perform Kill
@@ -131,6 +133,8 @@ public class BallActionController : MonoBehaviour
                 this.ballRigidbody.velocity = new Vector2(0f, 0f);
                 this.ballRigidbody.AddForce(directionPlayer_Mouse * killForce * forceMultiplier, ForceMode2D.Impulse);
                 _ = canKill.GluedChangeValue(false, 0.4f);
+                // Resume the mouse-direction indicator
+                GameObject.FindGameObjectWithTag("Indicator_Mouse").GetComponent<SegmentIndicatorMouse>().SetFromOffset(Vector2.zero);
             }
         }
         else

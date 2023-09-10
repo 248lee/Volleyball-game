@@ -6,6 +6,7 @@ using UnityEngine;
 public class SegmentController : MonoBehaviour
 {
     LineRenderer lineRenderer;
+    public Vector2 fromOffset = Vector2.zero;
     protected virtual void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
@@ -22,5 +23,9 @@ public class SegmentController : MonoBehaviour
     {
         Vector3[] vertices = {position_from, position_to};
         lineRenderer.SetPositions(vertices);
+    }
+    public void SetFromOffset(Vector2 set)
+    {
+        this.fromOffset = set;
     }
 }
